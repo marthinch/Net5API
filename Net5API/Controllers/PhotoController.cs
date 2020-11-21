@@ -23,7 +23,7 @@ namespace Net5API.Controllers
 
         [HttpGet]
         [Route("method1")]
-        public async Task<IEnumerable<Photo>> Method1Async()
+        public async Task<object> Method1Async()
         {
             using var response = await httpClient.GetAsync(endpoint, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
@@ -31,7 +31,14 @@ namespace Net5API.Controllers
             if (response.Content is object)
             {
                 var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                return await JsonSerializer.DeserializeAsync<List<Photo>>(stream).ConfigureAwait(false);
+                var data = await JsonSerializer.DeserializeAsync<List<Photo>>(stream).ConfigureAwait(false);
+
+                var result = new
+                {
+                    Count = data.Count,
+                    Photos = data
+                };
+                return result;
             }
 
             return null;
@@ -39,9 +46,16 @@ namespace Net5API.Controllers
 
         [HttpGet]
         [Route("method2")]
-        public async Task<IEnumerable<Photo>> Method2Async()
+        public async Task<object> Method2Async()
         {
-            return await httpClient.GetFromJsonAsync<List<Photo>>(endpoint).ConfigureAwait(false);
+            var data = await httpClient.GetFromJsonAsync<List<Photo>>(endpoint).ConfigureAwait(false);
+
+            var result = new
+            {
+                Count = data.Count,
+                Photos = data
+            };
+            return result;
         }
     }
 }
