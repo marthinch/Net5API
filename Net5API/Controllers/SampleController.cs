@@ -51,8 +51,8 @@ namespace Net5API.Controllers
                         url = a.url,
                         thumbnailUrl = a.thumbnailUrl
                     });
-                    await _context.Photo.AddRangeAsync(newPhotos);
-                    await _context.SaveChangesAsync();
+                    await _context.Photo.AddRangeAsync(newPhotos).ConfigureAwait(false);
+                    await _context.SaveChangesAsync().ConfigureAwait(false);
                 }
             }
             catch (Exception exception)
@@ -84,8 +84,8 @@ namespace Net5API.Controllers
                     url = a.url,
                     thumbnailUrl = a.thumbnailUrl
                 });
-                await _context.Photo.AddRangeAsync(newPhotos);
-                await _context.SaveChangesAsync();
+                await _context.Photo.AddRangeAsync(newPhotos).ConfigureAwait(false);
+                await _context.SaveChangesAsync().ConfigureAwait(false);
             }
             catch (Exception exception)
             {
@@ -106,13 +106,12 @@ namespace Net5API.Controllers
         {
             try
             {
-                // Remove from database
-                var oldPhotos = await _context.Photo.ToListAsync();
-                if (oldPhotos != null && oldPhotos.Any())
-                {
-                    _context.Photo.RemoveRange(oldPhotos);
-                    await _context.SaveChangesAsync();
-                }
+                // Truncate table
+                var tableName = "Photo";
+                var sqlQuery = $"TRUNCATE TABLE {tableName}";
+                var result = _context.Database.ExecuteSqlRaw(sqlQuery);
+
+                await _context.SaveChangesAsync().ConfigureAwait(false);
             }
             catch (Exception exception)
             {

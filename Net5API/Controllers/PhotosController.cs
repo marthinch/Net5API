@@ -20,9 +20,16 @@ namespace Net5API.Controllers
 
         // GET: api/Photos
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Photo>>> GetPhoto()
+        public async Task<ActionResult> GetPhoto()
         {
-            return await _context.Photo.ToListAsync();
+            var photos = await _context.Photo.ToListAsync();
+
+            var result = new
+            {
+                Count = photos.Count,
+                Photos = photos
+            };
+            return Ok(result);
         }
 
         // GET: api/Photos/5
